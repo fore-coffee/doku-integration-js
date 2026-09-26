@@ -39,7 +39,7 @@ jobs:
       # tags first, while the versions they point at still exist
       - name: Remove preview dist-tags for this PR
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.ALBASYIR_USER_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
           PKG: "@fore-coffee/doku-integration-js"
         run: |
@@ -60,7 +60,7 @@ jobs:
       # 0.2.1-preview-78-a1b2c3d matches for PR 78 and can never match another PR's preview
       - name: Delete preview packages for this PR
         env:
-          GH_TOKEN: ${{ secrets.ALBASYIR_USER_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
           OWNER: fore-coffee
           PACKAGE: doku-integration-js

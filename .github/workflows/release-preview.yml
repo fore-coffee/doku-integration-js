@@ -69,7 +69,7 @@ jobs:
       # any dist-tag other than `latest` keeps real releases in front for a plain `npm i`
       - name: Publish to GitHub Packages
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.ALBASYIR_USER_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish --tag "${{ steps.version.outputs.tag }}"
 
       - name: Comment install instructions
