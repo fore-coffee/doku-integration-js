@@ -72,6 +72,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish --tag "${{ steps.version.outputs.tag }}"
 
+      # TEST ONLY: a non-preview version standing in for a real release
+      - name: "[test] Publish fake release 0.0.1"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm version --no-git-tag-version 0.0.1
+          npm publish --tag latest || echo "0.0.1 already published"
+
       - name: Comment install instructions
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +99,7 @@ jobs:
             "Commit \`${SHA:0:7}\` is published:" \
             "" \
             '```bash' \
-            "npm i @fore-coffee/doku-integration-js@$TAG" \
+            "npm i @fore-coffee/doku-integration-js-cleanup-test@$TAG" \
             '```' \
             "" \
             "Resolves to version \`$VERSION\`. A plain \`npm i\` still gets real releases.")
