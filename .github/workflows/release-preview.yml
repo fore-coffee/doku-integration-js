@@ -19,9 +19,8 @@ jobs:
     runs-on: ubuntu-latest
 
     # forks and dependabot run without the publish secret, so there is nothing to publish with
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]'
+    # TEST ONLY: never publish, to reproduce cleanup on a PR that has no preview
+    if: false
 
     permissions:
       contents: read
