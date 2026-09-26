@@ -49,6 +49,24 @@ describe('Get Token B2B', () => {
         });
     });
 
+    describe('constructor', () => {
+        test('should not request a B2B token on construction', () => {
+            TokenController.prototype.getTokenB2B.mockClear();
+
+            const freshSnap = new Snap({
+                isProduction: false,
+                privateKey: privateKey,
+                clientID: clientID,
+                publicKey: publicKey,
+                issuer: "issuer",
+                secretKey: secretKey
+            });
+
+            expect(TokenController.prototype.getTokenB2B).not.toHaveBeenCalled();
+            expect(freshSnap.tokenB2B).toBe('');
+        });
+    });
+
     describe('getTokenB2B', () => {
         test('should successfully get and set token', async () => {
             // Setup mock to return a successful token response
