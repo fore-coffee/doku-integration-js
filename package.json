@@ -1,14 +1,15 @@
 {
-  "name": "doku-nodejs-library",
-  "version": "1.0.52",
+  "name": "@fore-coffee/doku-integration-js",
+  "version": "0.0.0",
   "description": "doku nodejs library",
   "main": "index.js",
   "scripts": {
+    "build": "node -e \"require('./')\"",
     "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PTNUSASATUINTIARTHA-DOKU/doku-nodejs-library.git"
+    "url": "git+https://github.com/fore-coffee/doku-integration-js.git"
   },
   "keywords": [
     "doku",
@@ -18,9 +19,9 @@
   "author": "zulfikar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/PTNUSASATUINTIARTHA-DOKU/doku-nodejs-library/issues"
+    "url": "https://github.com/fore-coffee/doku-integration-js/issues"
   },
-  "homepage": "https://github.com/PTNUSASATUINTIARTHA-DOKU/doku-nodejs-library#readme",
+  "homepage": "https://github.com/fore-coffee/doku-integration-js#readme",
   "dependencies": {
     "axios": "^1.6.8",
     "crypto-js": "^4.2.0",
@@ -34,5 +35,8 @@
   },
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }

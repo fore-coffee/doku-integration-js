@@ -1,0 +1,123 @@
+name: 🧹 Clean Up PR Preview
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: 🗑️ Remove Preview Packages
+    runs-on: ubuntu-latest
+
+    # mirrors the publish job: nothing was ever published for forks or dependabot
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
+
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@fore-coffee"
+
+      # tags first, while the versions they point at still exist
+      - name: Remove preview dist-tags for this PR
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          PKG: "@fore-coffee/doku-integration-js"
+        run: |
+          set -uo pipefail
+
+          TAGS=$(npm dist-tag ls "$PKG" 2>/dev/null | cut -d: -f1 | grep -E "^pr-$PR-[0-9a-f]+$" || true)
+
+          if [ -z "$TAGS" ]; then
+            echo "No preview dist-tags for PR #$PR."
+          else
+            for TAG in $TAGS; do
+              echo "Removing dist-tag $TAG"
+              npm dist-tag rm "$PKG" "$TAG" || echo "::warning::could not remove dist-tag $TAG"
+            done
+          fi
+
+      # deleting a package version is permanent, so the pattern is anchored on the PR number:
+      # 0.2.1-preview-78-a1b2c3d matches for PR 78 and can never match another PR's preview
+      #
+      # REMEMBER: a closed PR's preview versions must always be deleted here, or they pile up in
+      # the registry forever. GITHUB_TOKEN can only delete them because this repo publishes the
+      # package from a workflow and so gets admin on it, which GitHub documents as public preview.
+      # If this step starts failing with 403, delete the leftover versions by hand (package
+      # settings → Manage versions) and give GH_TOKEN a token with read:packages + delete:packages.
+      - name: Delete preview packages for this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          OWNER: fore-coffee
+          PACKAGE: doku-integration-js
+        run: |
+          set -euo pipefail
+
+          # the first publish creates the package and deleting its last version deletes it, so a PR
+          # that never got a preview can find no package at all: that is nothing to clean up, not a failure
+          if ! IDS=$(gh api "/orgs/$OWNER/packages/npm/$PACKAGE/versions?per_page=100" --paginate \
+            --jq ".[] | select(.name | test(\"-preview-$PR-[0-9a-f]+$\")) | \"\(.id) \(.name)\"" 2>"$RUNNER_TEMP/gh-error.log"); then
+            if grep -q "HTTP 404" "$RUNNER_TEMP/gh-error.log"; then
+              echo "Package $PACKAGE does not exist — nothing to clean up for PR #$PR."
+              exit 0
+            fi
+            cat "$RUNNER_TEMP/gh-error.log" >&2
+            exit 1
+          fi
+
+          if [ -z "$IDS" ]; then
+            echo "No preview packages found for PR #$PR — nothing to clean up."
+            exit 0
+          fi
+
+          while read -r ID NAME; do
+            echo "Deleting $NAME (id $ID)"
+            gh api --method DELETE "/orgs/$OWNER/packages/npm/$PACKAGE/versions/$ID" --silent
+          done <<< "$IDS"
+
+          echo "Removed $(echo "$IDS" | wc -l) preview version(s) for PR #$PR."
+
+      - name: Delete the preview comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          MARKER='<!-- pr-preview-release -->'
+
+          # one comment per push, so there is a whole run of them to clear
+          IDS=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments?per_page=100" --paginate \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id")
+
+          if [ -z "$IDS" ]; then
+            echo "No preview comments to remove."
+            exit 0
+          fi
+
+          # they advertise versions that no longer exist, so they go with them
+          for ID in $IDS; do
+            gh api --method DELETE "repos/$GITHUB_REPOSITORY/issues/comments/$ID" --silent
+          done
+
+          echo "Removed $(echo "$IDS" | wc -l) preview comment(s)."
