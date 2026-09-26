@@ -58,6 +58,12 @@ jobs:
 
       # deleting a package version is permanent, so the pattern is anchored on the PR number:
       # 0.2.1-preview-78-a1b2c3d matches for PR 78 and can never match another PR's preview
+      #
+      # REMEMBER: a closed PR's preview versions must always be deleted here, or they pile up in
+      # the registry forever. GITHUB_TOKEN can only delete them because this repo publishes the
+      # package from a workflow and so gets admin on it, which GitHub documents as public preview.
+      # If this step starts failing with 403, delete the leftover versions by hand (package
+      # settings → Manage versions) and give GH_TOKEN a token with read:packages + delete:packages.
       - name: Delete preview packages for this PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
