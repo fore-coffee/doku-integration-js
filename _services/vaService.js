@@ -1,5 +1,5 @@
 "use strict"
-const { default: axios } = require('axios');
+const httpClient = require('../_commons/httpClient');
 const xml2js = require('xml2js');
 const KJUR = require('jsrsasign');
 const config = require('../_commons/config');
@@ -45,7 +45,7 @@ module.exports = {
             "CHANNEL-ID":requestHeaderDto.channelId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
@@ -74,7 +74,7 @@ module.exports = {
         }
         // console.log(header)
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'put',
                 url: base_url_api,
                 headers: header,
@@ -101,7 +101,7 @@ module.exports = {
             "CHANNEL-ID":requestHeaderDto.channelId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'delete',
                 url: base_url_api,
                 headers: header,
@@ -127,7 +127,7 @@ module.exports = {
             "CHANNEL-ID":requestHeaderDto.channelId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
