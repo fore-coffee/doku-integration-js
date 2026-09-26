@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 # Same steps as fore-coffee/devops-gh-workflows js-package-release.yml@v0.1.3,
 # which fore-coffee/cache-manager-js calls. They are inlined because this
@@ -40,7 +41,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.ALBASYIR_USER_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish
 
       - name: Notify Slack
