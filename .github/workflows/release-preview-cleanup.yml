@@ -67,8 +67,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          IDS=$(gh api "/orgs/$OWNER/packages/npm/$PACKAGE/versions?per_page=100" --paginate \
-            --jq ".[] | select(.name | test(\"-preview-$PR-[0-9a-f]+$\")) | \"\(.id) \(.name)\"")
+          # the first publish creates the package and deleting its last version deletes it, so a PR
+          # that never got a preview can find no package at all: that is nothing to clean up, not a failure
+          if ! IDS=$(gh api "/orgs/$OWNER/packages/npm/$PACKAGE/versions?per_page=100" --paginate \
+            --jq ".[] | select(.name | test(\"-preview-$PR-[0-9a-f]+$\")) | \"\(.id) \(.name)\"" 2>"$RUNNER_TEMP/gh-error.log"); then
+            if grep -q "HTTP 404" "$RUNNER_TEMP/gh-error.log"; then
+              echo "Package $PACKAGE does not exist — nothing to clean up for PR #$PR."
+              exit 0
+            fi
+            cat "$RUNNER_TEMP/gh-error.log" >&2
+            exit 1
+          fi
 
           if [ -z "$IDS" ]; then
             echo "No preview packages found for PR #$PR — nothing to clean up."
