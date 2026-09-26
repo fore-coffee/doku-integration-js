@@ -29,7 +29,6 @@ class Snap{
         this.dokuPublicKey = options.dokuPublicKey
         this.issuer = options.issuer;
         this.secretKey = options.secretKey;
-        this.getTokenB2B() 
     }
    
     
