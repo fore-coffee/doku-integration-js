@@ -1,5 +1,5 @@
 "use strict"
-const { default: axios } = require('axios');
+const httpClient = require('../_commons/httpClient');
 const KJUR = require('jsrsasign');
 const config = require('../_commons/config');
 const jwt = require('jsonwebtoken');
@@ -158,7 +158,7 @@ module.exports = {
             grantType : createTokenB2BRequestDTO.grantType
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
@@ -258,7 +258,7 @@ module.exports = {
             "X-SIGNATURE": signature
         };
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,

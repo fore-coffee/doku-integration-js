@@ -1,6 +1,6 @@
 "use strict"
 
-const { default: axios } = require("axios");
+const httpClient = require("../_commons/httpClient");
 const crypto = require('crypto');
 
 const AES = 'aes-128-cbc';
@@ -22,7 +22,7 @@ module.exports = {
             "X-IP-ADDRESS":requestHeaderDto.xIpAddres
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
@@ -50,7 +50,7 @@ module.exports = {
             "X-DEVICE-ID":requestHeaderDto.xDeviceId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
@@ -79,7 +79,7 @@ module.exports = {
             "X-CHANNEL-ID":requestHeaderDto.xChannelId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
@@ -106,7 +106,7 @@ module.exports = {
             "Authorization-customer":header.xAuthorizationCustomer
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,
@@ -137,7 +137,7 @@ module.exports = {
             headerObj["X-DEVICE-ID"] = header.xDeviceId;
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,
@@ -164,7 +164,7 @@ module.exports = {
             "CHANNEL-ID":"DH"
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,
@@ -190,7 +190,7 @@ module.exports = {
             "Authorization":"Bearer "+header.authorization
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,
@@ -221,7 +221,7 @@ module.exports = {
             headerObj["X-DEVICE-ID"] = header.xDeviceId;
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,
@@ -246,7 +246,7 @@ module.exports = {
             "X-EXTERNAL-ID": header.xExternalId
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: headerObj,

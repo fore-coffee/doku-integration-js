@@ -11,6 +11,8 @@ class Config{
   static CORE_SANDBOX_BASE_URL = 'https://api-sandbox.doku.com';
   // static CORE_SANDBOX_BASE_URL = 'https://api-uat.doku.com';
   static CORE_PRODUCTION_BASE_URL = 'https://api.doku.com';
+  // axios defaults to 0 (wait forever); give up when DOKU goes silent for this long
+  static REQUEST_TIMEOUT_MS = 5000;
   static ACCESS_TOKEN = '/authorization/v1/access-token/b2b';
   static CREATE_VA = '/virtual-accounts/bi-snap-va/v1.1/transfer-va/create-va';
   static UPDATE_VA = '/virtual-accounts/bi-snap-va/v1.1/transfer-va/update-va';
