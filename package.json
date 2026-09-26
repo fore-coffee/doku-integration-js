@@ -1,5 +1,5 @@
 {
-  "name": "@fore-coffee/doku-integration-js",
+  "name": "@fore-coffee/doku-integration-js-cleanup-test",
   "version": "0.0.0",
   "description": "doku nodejs library",
   "main": "index.js",

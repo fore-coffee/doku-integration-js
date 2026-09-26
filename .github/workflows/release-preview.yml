@@ -19,9 +19,8 @@ jobs:
     runs-on: ubuntu-latest
 
     # forks and dependabot run without the publish secret, so there is nothing to publish with
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]'
+    # TEST ONLY: never publish
+    if: false
 
     permissions:
       contents: read
@@ -91,7 +90,7 @@ jobs:
             "Commit \`${SHA:0:7}\` is published:" \
             "" \
             '```bash' \
-            "npm i @fore-coffee/doku-integration-js@$TAG" \
+            "npm i @fore-coffee/doku-integration-js-cleanup-test@$TAG" \
             '```' \
             "" \
             "Resolves to version \`$VERSION\`. A plain \`npm i\` still gets real releases.")
