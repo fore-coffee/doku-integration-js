@@ -34,9 +34,15 @@ If your looking for another language  [PHP](https://github.com/PTNUSASATUINTIART
 - NODE JS version 18 or higher
 
 ### Installation
-To install the Doku Snap SDK, use Composer:
+The package is published to GitHub Packages. Point the `@fore-coffee` scope at it in your project's `.npmrc`, using a GitHub token with `read:packages`:
+```
+@fore-coffee:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+```
+
+Then install it:
 ```bash
-npm i doku-nodejs-library
+npm i @fore-coffee/doku-integration-js
 ```
 
 ### Configuration
@@ -68,7 +74,7 @@ The encryption model applied to messages involves both asymmetric and symmetric 
 
 
 ```js
-const doku = require('doku-nodejs-library');
+const doku = require('@fore-coffee/doku-integration-js');
 
 let privateKey = `-----BEGIN PRIVATE KEY-----
 your privatekey
@@ -234,10 +240,10 @@ Parameters for **createVA** and **updateVA**
 1. **Create Virtual Account**
     - **Function:** `createVa`
     ```js
-    const CreateVARequestDto = require('doku-nodejs-library/_models/createVaRequestDto');
-    const VirtualAccountConfig = require('doku-nodejs-library/_models/virtualAccountConfig');
-    const TotalAmount = require('doku-nodejs-library/_models/totalAmount');
-    const AdditionalInfo = require('doku-nodejs-library/_models/additionalInfo');
+    const CreateVARequestDto = require('@fore-coffee/doku-integration-js/_models/createVaRequestDto');
+    const VirtualAccountConfig = require('@fore-coffee/doku-integration-js/_models/virtualAccountConfig');
+    const TotalAmount = require('@fore-coffee/doku-integration-js/_models/totalAmount');
+    const AdditionalInfo = require('@fore-coffee/doku-integration-js/_models/additionalInfo');
     
     app.post('/create-va', async (req,res) => {
       let createVaRequestDto = new CreateVARequestDto();
@@ -283,10 +289,10 @@ Parameters for **createVA** and **updateVA**
     - **Function:** `updateVa`
 
     ```js
-    const UpdateVaVirtualAccountConfigDto = require('doku-nodejs-library/_models/updateVaVirtualAccountConfigDTO');
-    const VirtualAccountConfig = require('doku-nodejs-library/_models/virtualAccountConfig');
-    const TotalAmount = require('doku-nodejs-library/_models/totalAmount');
-    const UpdateVaAdditionalInfoDto = require('doku-nodejs-library/_models/updateVaAdditionalInfoDTO');
+    const UpdateVaVirtualAccountConfigDto = require('@fore-coffee/doku-integration-js/_models/updateVaVirtualAccountConfigDTO');
+    const VirtualAccountConfig = require('@fore-coffee/doku-integration-js/_models/virtualAccountConfig');
+    const TotalAmount = require('@fore-coffee/doku-integration-js/_models/totalAmount');
+    const UpdateVaAdditionalInfoDto = require('@fore-coffee/doku-integration-js/_models/updateVaAdditionalInfoDTO');
     
       app.post('/update-va', async (req,res) => {
         let updateVaRequestDto = new UpdateVaDto()
@@ -341,8 +347,8 @@ Parameters for **createVA** and **updateVA**
   - **Function:** `deletePaymentCode`
 
     ```js
-    const DeleteVaRequestDto = require('doku-nodejs-library/_models/deleteVaRequestDTO');
-    const DeleteVaRequestAdditionalInfo = require('doku-nodejs-library/_models/deleteVaRequestAdditionalInfoDTO');
+    const DeleteVaRequestDto = require('@fore-coffee/doku-integration-js/_models/deleteVaRequestDTO');
+    const DeleteVaRequestAdditionalInfo = require('@fore-coffee/doku-integration-js/_models/deleteVaRequestAdditionalInfoDTO');
     
     app.post('/delete-va', async (req,res) => {
       let deleteVaRequestDto = new DeleteVaRequestDto()
@@ -375,12 +381,12 @@ Parameters for **createVA** and **updateVA**
 - **Function:** `directInquiryVa`
 
     ```js
-    const InquiryResponseVirtualAccountDataDTO = require('doku-nodejs-library/_models/InquiryResponseVirtualAccountDataDTO');
-    const InquiryResponseBodyDTO = require('doku-nodejs-library/_models/inquiryResponseBodyDTO');
-    const TotalAmount = require('doku-nodejs-library/_models/totalAmount');
-    const InquiryResponseAdditionalInfoDTO = require('doku-nodejs-library/_models/inquiryResponseAdditionalInfoDTO');
-    const VirtualAccountConfig = require('doku-nodejs-library/_models/virtualAccountConfig');
-    const InquiryReasonDto = require('doku-nodejs-library/_models/inquiryReasonDTO');
+    const InquiryResponseVirtualAccountDataDTO = require('@fore-coffee/doku-integration-js/_models/InquiryResponseVirtualAccountDataDTO');
+    const InquiryResponseBodyDTO = require('@fore-coffee/doku-integration-js/_models/inquiryResponseBodyDTO');
+    const TotalAmount = require('@fore-coffee/doku-integration-js/_models/totalAmount');
+    const InquiryResponseAdditionalInfoDTO = require('@fore-coffee/doku-integration-js/_models/inquiryResponseAdditionalInfoDTO');
+    const VirtualAccountConfig = require('@fore-coffee/doku-integration-js/_models/virtualAccountConfig');
+    const InquiryReasonDto = require('@fore-coffee/doku-integration-js/_models/inquiryReasonDTO');
       app.post("/v1.1/transfer-va/inquiry",(req,res)=>{
         let data = new InquiryRequestDTO();
         data.partnerServiceId = req.body.partnerServiceId;
@@ -450,7 +456,7 @@ Parameters for **createVA** and **updateVA**
 
   - **Function:** `checkStatusVa`
     ```js
-    const CheckStatusVARequestDto = require('doku-nodejs-library/_models/checkStatusVARequestDTO');
+    const CheckStatusVARequestDto = require('@fore-coffee/doku-integration-js/_models/checkStatusVARequestDTO');
     
     app.post('/check-status', async (req,res) => {
       let checkVaRequestDto = new CheckStatusVARequestDto()
@@ -574,7 +580,7 @@ Each card/account can only registered/bind to one customer on one merchant. Cust
   - **Function:** `doAccountBinding`
 
     ```js
-    const AccountBindingRequestDto = require('doku-nodejs-library/_models/accountBindingRequestDTO');
+    const AccountBindingRequestDto = require('@fore-coffee/doku-integration-js/_models/accountBindingRequestDTO');
     
     app.post("/account-binding", async (req,res)=>{
       let request = new AccountBindingRequestDto()
@@ -616,7 +622,7 @@ Each card/account can only registered/bind to one customer on one merchant. Cust
    ```
     - **Function:** `doAccountUnbinding`
     ```js
-    const {AccountUnbindingRequestDto,AccountUnbindingAdditionalInfo} = require('doku-nodejs-library/_models/accountUnbindingRequestDTO');
+    const {AccountUnbindingRequestDto,AccountUnbindingAdditionalInfo} = require('@fore-coffee/doku-integration-js/_models/accountUnbindingRequestDTO');
     
     app.post("/account-unbinding", async (req,res)=>{
       let request = new AccountUnbindingRequestDto()
@@ -642,7 +648,7 @@ Each card/account can only registered/bind to one customer on one merchant. Cust
     - **Function:** `doCardRegistration`
 
     ```js
-    const CardRegistrationRequestDTO = require('doku-nodejs-library/_models/cardRegistrationRequestDTO');
+    const CardRegistrationRequestDTO = require('@fore-coffee/doku-integration-js/_models/cardRegistrationRequestDTO');
     
     app.post("/card-registration", async (req,res)=>{
       let request = new CardRegistrationRequestDTO()
@@ -686,7 +692,7 @@ Each card/account can only registered/bind to one customer on one merchant. Cust
     - **Function:** `doCardUnbinding`
 
     ```js
-    const CardUnRegistUnbindRequestDTO= require('doku-nodejs-library/_models/cardUnregistUnbindRequestDTO');
+    const CardUnRegistUnbindRequestDTO= require('@fore-coffee/doku-integration-js/_models/cardUnregistUnbindRequestDTO');
       
     app.post("/card-unbinding", async (req,res)=>{
       let request = new CardUnRegistUnbindRequestDTO(req.body.tokenId,
@@ -809,7 +815,7 @@ Here’s how you can use the `doPayment` function for both payment types:
   - **Function:** `doPayment`
     
     ```js
-    const { PaymentRequestDto } = require('doku-nodejs-library/_models/paymentRequestDirectDebitDTO');
+    const { PaymentRequestDto } = require('@fore-coffee/doku-integration-js/_models/paymentRequestDirectDebitDTO');
     
      app.post("/debit-payment", async (req,res)=>{
           let request = new PaymentRequestDto()
@@ -934,7 +940,7 @@ For Shopeepay and Dana you can use the `doPaymentJumpApp` function for for Jumpa
 - **Function:** `doPaymentJumpApp`
 
 ```js
-    const PaymentJumpAppRequestDto = require('doku-nodejs-library/_models/paymentJumpAppRequestDTO');
+    const PaymentJumpAppRequestDto = require('@fore-coffee/doku-integration-js/_models/paymentJumpAppRequestDTO');
     
     app.post("/payment-jump-app", async (req,res)=>{
       let request = new PaymentJumpAppRequestDto()
@@ -966,7 +972,7 @@ For Shopeepay and Dana you can use the `doPaymentJumpApp` function for for Jumpa
 ### A. Check Transaction Status
 
   ```js
-  const CheckStatusDirectDebitDTO = require('doku-nodejs-library/_models/checkStatusDirectDebitRequestDTO');
+  const CheckStatusDirectDebitDTO = require('@fore-coffee/doku-integration-js/_models/checkStatusDirectDebitRequestDTO');
   
    app.post('/debit-status', async (req,res) => {
       let request = new CheckStatusDirectDebitDTO()
@@ -998,7 +1004,7 @@ For Shopeepay and Dana you can use the `doPaymentJumpApp` function for for Jumpa
 ### B. Refund
 
   ```js
-  const RefundRequestDto = require('doku-nodejs-library/_models/refundRequestDTO');
+  const RefundRequestDto = require('@fore-coffee/doku-integration-js/_models/refundRequestDTO');
   
   app.post("/refund", async (req,res)=>{
       let request = new RefundRequestDto();
@@ -1027,7 +1033,7 @@ For Shopeepay and Dana you can use the `doPaymentJumpApp` function for for Jumpa
 ### C. Balance Inquiry
 
   ```js
-  const BalanceInquiryRequestDto = require('doku-nodejs-library/_models/balanceInquiryRequestDTO');
+  const BalanceInquiryRequestDto = require('@fore-coffee/doku-integration-js/_models/balanceInquiryRequestDTO');
   
   app.post("/balance-inquiry", async (req,res)=>{
       let request = new BalanceInquiryRequestDto();
