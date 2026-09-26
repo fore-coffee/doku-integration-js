@@ -41,7 +41,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
-          PKG: "@fore-coffee/doku-integration-js"
+          PKG: "@fore-coffee/doku-integration-js-cleanup-test"
         run: |
           set -uo pipefail
 
@@ -63,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.number }}
           OWNER: fore-coffee
-          PACKAGE: doku-integration-js
+          PACKAGE: doku-integration-js-cleanup-test
         run: |
           set -euo pipefail
 
@@ -106,3 +106,15 @@ jobs:
           done
 
           echo "Removed $(echo "$IDS" | wc -l) preview comment(s)."
+
+      # TEST ONLY: evidence of what is left after cleanup
+      - name: "[test] Inspect package after cleanup"
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "--- versions (REST):"
+          gh api "/orgs/fore-coffee/packages/npm/doku-integration-js-cleanup-test/versions?per_page=100" --jq '.[] | "\(.id) \(.name)"' || true
+          echo "--- dist-tags (registry):"
+          npm dist-tag ls "@fore-coffee/doku-integration-js-cleanup-test" || true

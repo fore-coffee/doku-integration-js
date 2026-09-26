@@ -91,7 +91,7 @@ jobs:
             "Commit \`${SHA:0:7}\` is published:" \
             "" \
             '```bash' \
-            "npm i @fore-coffee/doku-integration-js@$TAG" \
+            "npm i @fore-coffee/doku-integration-js-cleanup-test@$TAG" \
             '```' \
             "" \
             "Resolves to version \`$VERSION\`. A plain \`npm i\` still gets real releases.")
