@@ -22,6 +22,7 @@ class VaController{
         if(TokenService.isTokenEmpty(tokenB2B)){
             return true
         }else{
+            // fore: unused and broken (TokenService is undefined here). isTokenExpired takes 2 args (tokenExpiresIn, tokenGeneratedTimestamp), see TokenController.isTokenInvalid
             if(TokenService.isTokenExpired(tokenB2B, tokenExpiresIn, tokenGeneratedTimestamp)){
                 return true
             }else{
