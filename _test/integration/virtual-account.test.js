@@ -1,4 +1,4 @@
-// L8 integration suite: real Snap against the DOKU SANDBOX. No mocks of lib/axios/jwt.
+// L8 integration suite: real Snap calling the real DOKU API (non-production, isProduction: false). No mocks of lib/axios/jwt.
 // Run: npm run test:integration (loads .env). Skipped when DOKU_CLIENT_ID is unset.
 // Tokens/secrets are never asserted by value: compare timestamps / booleans only.
 const { spawnSync } = require("child_process");
@@ -14,7 +14,7 @@ const run = env.DOKU_CLIENT_ID ? describe : describe.skip;
 
 jest.setTimeout(30000);
 
-run("DOKU sandbox integration", () => {
+run("DOKU virtual account integration", () => {
     // isProduction is hard-coded: this suite must never hit production.
     const snapOptions = (over = {}) => ({
         isProduction: false,
@@ -86,7 +86,7 @@ run("DOKU sandbox integration", () => {
         return buildCheckStatusDto(res.virtualAccountData.virtualAccountNo.trim().slice(psid.length));
     };
 
-    // Fresh Snap with a valid token already fetched, for the L1 expiry cases.
+    // Fresh Snap with a valid token already fetched, for the token refresh cases.
     const snapWithToken = async () => {
         const s = new Snap(snapOptions());
         await s.getTokenB2B();
@@ -315,10 +315,10 @@ run("DOKU sandbox integration", () => {
         });
     });
 
-    // L1: token expiry. Refetch is detected via tokenGeneratedTimestamp, NOT tokenB2B
+    // B2B token refresh (fix in this PR). A refetch is detected via tokenGeneratedTimestamp, NOT tokenB2B
     // (DOKU may hand back the same token while it is still valid).
-    describe("L1 token expiry", () => {
-        test("fresh Snap, empty token: one fetch on checkStatusVa", async () => {
+    describe("B2B token refresh on expiry (checkStatusVa)", () => {
+        test("fetches a token on the first call when none exists", async () => {
             const s = new Snap(snapOptions());
             expect(s.tokenGeneratedTimestamp).toBe("");
             const res = await s.checkStatusVa(await checkStatusDto());
@@ -327,7 +327,7 @@ run("DOKU sandbox integration", () => {
             expect(!!s.tokenB2B).toBe(true);
         });
 
-        test("two checkStatusVa back to back: second does not refetch", async () => {
+        test("reuses the token on consecutive calls (no refetch)", async () => {
             const s = new Snap(snapOptions());
             const dto = await checkStatusDto();
             await s.checkStatusVa(dto);
@@ -336,7 +336,7 @@ run("DOKU sandbox integration", () => {
             expect(s.tokenGeneratedTimestamp).toBe(ts);
         });
 
-        test("expired (now - 901s): refetch + success", async () => {
+        test("refreshes an expired token (generated 901s ago) and the call succeeds", async () => {
             const s = await snapWithToken();
             const stale = Date.now() - 901_000;
             s.tokenGeneratedTimestamp = stale;
@@ -346,7 +346,7 @@ run("DOKU sandbox integration", () => {
             expect(s.tokenGeneratedTimestamp > Date.now() - 60_000).toBe(true);
         });
 
-        test("inside the 30s safety margin (now - 875s): refetch", async () => {
+        test("refreshes a token inside the 30s safety margin (generated 875s ago)", async () => {
             const s = await snapWithToken();
             const stale = Date.now() - 875_000;
             s.tokenGeneratedTimestamp = stale;
@@ -354,7 +354,7 @@ run("DOKU sandbox integration", () => {
             expect(s.tokenGeneratedTimestamp > stale).toBe(true);
         });
 
-        test("outside the margin (now - 850s): no refetch", async () => {
+        test("keeps a token with more than 30s left (generated 850s ago, no refetch)", async () => {
             const s = await snapWithToken();
             const ts = Date.now() - 850_000;
             s.tokenGeneratedTimestamp = ts;
@@ -365,7 +365,7 @@ run("DOKU sandbox integration", () => {
 
         // Records today's behaviour (not a fix target): a token that is "fresh" per the
         // timestamp but rejected by DOKU is NOT retried; the 401 surfaces to the caller.
-        test("garbage token with a fresh timestamp: DOKU 401 4012601, no automatic retry", async () => {
+        test("does not retry a token DOKU rejects: surfaces 401 4012601 (garbage token, fresh timestamp)", async () => {
             const s = new Snap(snapOptions());
             s.tokenB2B = "garbage";
             s.tokenGeneratedTimestamp = Date.now();
