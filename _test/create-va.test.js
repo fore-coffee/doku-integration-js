@@ -245,4 +245,20 @@ let secretKey = 'SK-tDzY6MSLBWlNXy3qCsUU';
       );
       expect(result).toEqual({ success: true });
     });
+
+    test('should NOT call validateSimulator when isProduction is true', async () => {
+      snapInstance.isProduction = true;
+      TokenController.prototype.isTokenInvalid.mockReturnValue(false);
+      VaController.prototype.createVa.mockResolvedValue({ success: true });
+
+      const createVARequestDto = {
+        validateVaRequestDto: jest.fn(),
+        validateSimulator: jest.fn(),
+      };
+
+      const result = await snapInstance.createVa(createVARequestDto);
+
+      expect(createVARequestDto.validateSimulator).not.toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
   });

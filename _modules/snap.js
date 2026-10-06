@@ -81,9 +81,11 @@ class Snap{
 
     async createVa(createVARequestDto){
         createVARequestDto.validateVaRequestDto();
-        const simulatorResponse = createVARequestDto.validateSimulator();
-        if (simulatorResponse) {
-            return simulatorResponse;
+        if (!this.isProduction) {
+            const simulatorResponse = createVARequestDto.validateSimulator();
+            if (simulatorResponse) {
+                return simulatorResponse;
+            }
         }
         
         let tokenController = new TokenController();
@@ -190,9 +192,11 @@ class Snap{
     }
     async checkStatusVa(checkVARequestDTO){
         checkVARequestDTO.validateCheckStatusVaRequestDto()
-        const simulatorResponse = checkVARequestDTO.validateSimulator();
-        if (simulatorResponse) {
-            return simulatorResponse;
+        if (!this.isProduction) {
+            const simulatorResponse = checkVARequestDTO.validateSimulator();
+            if (simulatorResponse) {
+                return simulatorResponse;
+            }
         }
         let tokenController = new TokenController();
         let isTokenInvalid = tokenController.isTokenInvalid(this.tokenB2B, this.tokenExpiresIn, this.tokenGeneratedTimestamp)
