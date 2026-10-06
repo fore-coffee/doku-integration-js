@@ -41,3 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 /example-app/
+
+# Local DOKU credentials. npm ignores .gitignore when .npmignore exists, so list it here too.
+.env
