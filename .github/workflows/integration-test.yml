@@ -1,0 +1,56 @@
+name: 🔌 Integration Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# every run creates real VAs in the DOKU sandbox; a newer push makes the older run pointless
+concurrency:
+  group: integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: 🧪 DOKU Sandbox
+    runs-on: ubuntu-latest
+
+    # forks and dependabot run without the DOKU secrets, so there is nothing to test against
+    if: >-
+      github.event_name != 'pull_request' || (
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.actor != 'dependabot[bot]'
+      )
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run integration tests
+        env:
+          DOKU_CLIENT_ID: ${{ secrets.DOKU_CLIENT_ID }}
+          DOKU_SECRET_KEY: ${{ secrets.DOKU_SECRET_KEY }}
+          DOKU_PRIVATE_KEY: ${{ secrets.DOKU_PRIVATE_KEY }}
+          DOKU_PUBLIC_KEY: ${{ secrets.DOKU_PUBLIC_KEY }}
+          DOKU_PUBLIC_KEY_DOKU: ${{ secrets.DOKU_PUBLIC_KEY_DOKU }}
+          DOKU_ISSUER: ${{ secrets.DOKU_ISSUER }}
+          DOKU_PARTNER_SERVICE_ID: ${{ secrets.DOKU_PARTNER_SERVICE_ID }}
+          DOKU_CUSTOMER_NO: ${{ secrets.DOKU_CUSTOMER_NO }}
+          # optional repo variable; the tests fall back to CIMB
+          DOKU_VA_CHANNEL: ${{ vars.DOKU_VA_CHANNEL }}
+        run: npm run test:integration

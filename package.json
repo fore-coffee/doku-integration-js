@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build": "node -e \"require('./')\"",
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "jest --testPathIgnorePatterns /node_modules/ --runInBand _test/integration"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/_test/integration/"
+    ]
   },
   "repository": {
     "type": "git",

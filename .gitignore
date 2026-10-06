@@ -11,6 +11,10 @@
 npm-debug.log
 yarn-error.log
 
+# Local DOKU sandbox credentials for integration tests
+.env
+.env.*
+
 # IDEs and editors
 .idea/
 .project
