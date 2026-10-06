@@ -6,7 +6,7 @@ module.exports = {
             responseMessage:"success",
             partnerServiceId:PaymentNotificationRequestBodyDto.partnerServiceId,
             customerNo :PaymentNotificationRequestBodyDto.customerNo,
-            virtualAccountNo : PaymentNotificationRequestBodyDto.virtualAccoutNo,
+            virtualAccountNo : PaymentNotificationRequestBodyDto.virtualAccountNo,
             virtualAccountName :PaymentNotificationRequestBodyDto.virtualAccountName,
             paymentRequestId : PaymentNotificationRequestBodyDto.paymentRequestId,
             additionalInfo:PaymentNotificationRequestBodyDto.additionalInfo
@@ -18,7 +18,7 @@ module.exports = {
             responseMessage:"invalid Token ( B2B)",
             partnerServiceId:PaymentNotificationRequestBodyDto.partnerServiceId,
             customerNo :PaymentNotificationRequestBodyDto.customerNo,
-            virtualAccountNo : PaymentNotificationRequestBodyDto.virtualAccoutNo,
+            virtualAccountNo : PaymentNotificationRequestBodyDto.virtualAccountNo,
             virtualAccountName :PaymentNotificationRequestBodyDto.virtualAccountName,
             paymentRequestId : PaymentNotificationRequestBodyDto.paymentRequestId
         }
