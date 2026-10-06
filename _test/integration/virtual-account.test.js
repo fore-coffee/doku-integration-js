@@ -140,6 +140,20 @@ run("DOKU virtual account integration", () => {
             expect(typeof s.tokenGeneratedTimestamp).toBe("number");
         });
 
+        // The SDK re-stamps tokenGeneratedTimestamp and expiresIn on every refresh. That is only
+        // safe if DOKU never hands back the same, nearly-expired token with a full expiresIn.
+        // Observed: expiresIn is always 900 and the token differs from 1s later on (two calls in
+        // the same second return an identical token, so wait past it).
+        test("issues a fresh token with the full expiresIn on every call", async () => {
+            const s = new Snap(snapOptions());
+            const first = await s.getTokenB2B();
+            await new Promise((r) => setTimeout(r, 1100));
+            const second = await s.getTokenB2B();
+            expect(second.expiresIn).toBe(900);
+            // compare as a boolean so a failure never prints tokens
+            expect(second.accessToken !== first.accessToken).toBe(true);
+        });
+
         test("wrong clientID: rejects with AxiosError 401 4017300", async () => {
             const s = new Snap(snapOptions({ clientID: "L8-WRONG-CLIENT" }));
             const err = await s.getTokenB2B().then(
@@ -315,8 +329,9 @@ run("DOKU virtual account integration", () => {
         });
     });
 
-    // B2B token refresh (fix in this PR). A refetch is detected via tokenGeneratedTimestamp, NOT tokenB2B
-    // (DOKU may hand back the same token while it is still valid).
+    // B2B token refresh (fix in this PR). A refetch is detected via tokenGeneratedTimestamp.
+    // DOKU issues a fresh token with the full expiresIn on every getTokenB2B call (see the
+    // getTokenB2B test above), so a refresh never re-stamps a nearly-expired token.
     describe("B2B token refresh on expiry (checkStatusVa)", () => {
         test("fetches a token on the first call when none exists", async () => {
             const s = new Snap(snapOptions());
