@@ -44,3 +44,4 @@ Thumbs.db
 /example-app-test/
 
 package-lock.json
+.env
