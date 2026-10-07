@@ -114,6 +114,8 @@ run("DOKU virtual account integration", () => {
             const r = spawnSync(process.execPath, ["-e", childScript], {
                 env: { ...env, L8_SNAP_OPTIONS: JSON.stringify(options) },
                 encoding: "utf8",
+                // spawnSync blocks the event loop, so jest.setTimeout can't interrupt it
+                timeout: 15_000,
             });
             expect(r.status).toBe(0);
             return JSON.parse(r.stdout);

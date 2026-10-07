@@ -20,6 +20,8 @@ jobs:
   integration:
     name: 🧪 DOKU Sandbox
     runs-on: ubuntu-latest
+    # a hung DOKU call would otherwise hold the run for GitHub's 360 minute default
+    timeout-minutes: 10
 
     # forks and dependabot run without the DOKU secrets, so there is nothing to test against
     if: >-
