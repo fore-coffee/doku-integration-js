@@ -1,0 +1,81 @@
+name: 🔌 Integration Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# every run creates real VAs in the DOKU sandbox; a newer push makes the older run pointless
+concurrency:
+  group: integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: 🧪 DOKU Sandbox
+    runs-on: ubuntu-latest
+    # a hung DOKU call would otherwise hold the run for GitHub's 360 minute default
+    timeout-minutes: 10
+
+    # forks and dependabot run without the DOKU secrets, so there is nothing to test against
+    if: >-
+      github.event_name != 'pull_request' || (
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.actor != 'dependabot[bot]'
+      )
+
+    # the secrets are scoped to the two steps that need them (not the whole job), so
+    # checkout, setup-node and npm ci never see them
+
+    steps:
+      # the suite skips itself without DOKU_CLIENT_ID, which would pass green having tested nothing
+      - name: Require DOKU secrets
+        env:
+          DOKU_CLIENT_ID: ${{ secrets.DOKU_CLIENT_ID }}
+          DOKU_SECRET_KEY: ${{ secrets.DOKU_SECRET_KEY }}
+          DOKU_PRIVATE_KEY: ${{ secrets.DOKU_PRIVATE_KEY }}
+          DOKU_PUBLIC_KEY: ${{ secrets.DOKU_PUBLIC_KEY }}
+          DOKU_PUBLIC_KEY_DOKU: ${{ secrets.DOKU_PUBLIC_KEY_DOKU }}
+          DOKU_ISSUER: ${{ secrets.DOKU_ISSUER }}
+          DOKU_PARTNER_SERVICE_ID: ${{ secrets.DOKU_PARTNER_SERVICE_ID }}
+          DOKU_CUSTOMER_NO: ${{ secrets.DOKU_CUSTOMER_NO }}
+        run: |
+          missing=""
+          for name in DOKU_CLIENT_ID DOKU_SECRET_KEY DOKU_PRIVATE_KEY DOKU_PUBLIC_KEY DOKU_PUBLIC_KEY_DOKU DOKU_ISSUER DOKU_PARTNER_SERVICE_ID DOKU_CUSTOMER_NO; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repo secrets:$missing"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # no install scripts are needed on Linux, and none should ever see the secrets
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run integration tests
+        env:
+          DOKU_CLIENT_ID: ${{ secrets.DOKU_CLIENT_ID }}
+          DOKU_SECRET_KEY: ${{ secrets.DOKU_SECRET_KEY }}
+          DOKU_PRIVATE_KEY: ${{ secrets.DOKU_PRIVATE_KEY }}
+          DOKU_PUBLIC_KEY: ${{ secrets.DOKU_PUBLIC_KEY }}
+          DOKU_PUBLIC_KEY_DOKU: ${{ secrets.DOKU_PUBLIC_KEY_DOKU }}
+          DOKU_ISSUER: ${{ secrets.DOKU_ISSUER }}
+          DOKU_PARTNER_SERVICE_ID: ${{ secrets.DOKU_PARTNER_SERVICE_ID }}
+          DOKU_CUSTOMER_NO: ${{ secrets.DOKU_CUSTOMER_NO }}
+        run: npm run test:integration

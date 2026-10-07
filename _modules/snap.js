@@ -75,7 +75,7 @@ class Snap{
     }
     setTokenB2B2C(tokenB2B2cResponseDto){
         this.tokenB2b2c = tokenB2B2cResponseDto.accessToken;
-        this.tokenExpiresIn = tokenB2B2cResponseDto.expiresIn;
+        this.tokenB2b2cExpiresIn = tokenB2B2cResponseDto.expiresIn;
         this.tokenB2b2cGeneratedTimestamp = Date.now();
     }
 

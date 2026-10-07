@@ -177,8 +177,8 @@ module.exports = {
         return tokenB2B == null || tokenB2B == "";
     },
     isTokenExpired(tokenExpiresIn, tokenGeneratedTimestamp){
-        //tokenGeneratedTimestamp + tokenExpiresIn (second) < Now()
-        const expirationTime = tokenGeneratedTimestamp + tokenExpiresIn;
+        //tokenGeneratedTimestamp (ms) + tokenExpiresIn (second) - 30s margin < Now()
+        const expirationTime = tokenGeneratedTimestamp + tokenExpiresIn * 1000 - 30000;
         if(expirationTime <  Date.now()){
             return true
         }else{

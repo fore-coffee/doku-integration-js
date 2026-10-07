@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "node -e \"require('./')\"",
-    "test": "jest"
+    "test": "jest",
+    "test:integration": "node --env-file-if-exists=.env node_modules/jest/bin/jest.js _test/integration --runInBand"
   },
   "repository": {
     "type": "git",

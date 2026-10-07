@@ -12,7 +12,7 @@ class TokenController{
         if(TokenService.isTokenEmpty(tokenB2B)){
             return true
         }else{
-            if(TokenService.isTokenExpired(tokenB2B, tokenExpiresIn, tokenGeneratedTimestamp)){
+            if(TokenService.isTokenExpired(tokenExpiresIn, tokenGeneratedTimestamp)){
                 return true
             }else{
                 return false
