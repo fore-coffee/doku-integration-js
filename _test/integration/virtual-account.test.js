@@ -3,6 +3,7 @@
 // Tokens/secrets are never asserted by value: compare timestamps / booleans only.
 const { spawnSync } = require("child_process");
 const Snap = require("../../_modules/snap");
+const TokenService = require("../../_services/tokenService");
 const CreateVARequestDto = require("../../_models/createVaRequestDto");
 const TotalAmount = require("../../_models/totalAmount");
 const AdditionalInfo = require("../../_models/additionalInfo");
@@ -229,8 +230,25 @@ run("DOKU virtual account integration", () => {
     });
 
     describe("validateSignatureAndGenerateToken(request)", () => {
-        // The VALID-signature path can't be tested here: it needs a request signed with
-        // DOKU's private key, which we don't have.
+        // We don't have DOKU's private key, but the suite's own key pair works as a stand-in:
+        // sign with DOKU_PRIVATE_KEY and verify with DOKU_PUBLIC_KEY. This proves the verify
+        // logic accepts a good signature (not just that it rejects bad ones); it does NOT
+        // validate the DOKU_PUBLIC_KEY_DOKU secret itself.
+        test("valid signature: success response whose accessToken validateTokenB2B accepts", () => {
+            const s = new Snap(snapOptions({ dokuPublicKey: pem(env.DOKU_PUBLIC_KEY) }));
+            const timestamp = "2026-01-01T00:00:00+07:00";
+            const signature = TokenService.generateSignature(
+                pem(env.DOKU_PRIVATE_KEY),
+                env.DOKU_CLIENT_ID,
+                timestamp
+            );
+            const res = s.validateSignatureAndGenerateToken(
+                authRequest({ "x-timestamp": timestamp, "x-signature": signature })
+            );
+            expect(res.body.responseCode).toBe("2007300");
+            expect(!!s.validateTokenB2B(`Bearer ${res.body.accessToken}`)).toBe(true);
+        });
+
         const expectInvalidSignature = (res) => {
             expect(res.body.responseCode).toBe("4017300");
             expect(res.body.responseMessage).toBe("Unauthorized.Invalid Signature");
