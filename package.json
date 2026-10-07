@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node -e \"require('./')\"",
     "test": "jest",
-    "test:integration": "node --env-file-if-exists=.env node_modules/.bin/jest _test/integration --runInBand"
+    "test:integration": "node --env-file-if-exists=.env node_modules/jest/bin/jest.js _test/integration --runInBand"
   },
   "repository": {
     "type": "git",
