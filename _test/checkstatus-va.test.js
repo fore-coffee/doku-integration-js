@@ -77,6 +77,25 @@ describe('Snap class', () => {
 
        
 
+        test('should call validateSimulator when isProduction is false', async () => {
+            TokenController.prototype.isTokenInvalid.mockReturnValue(false);
+            const dto = { validateCheckStatusVaRequestDto: jest.fn(), validateSimulator: jest.fn() };
+            VaController.prototype.doCheckStatusVa.mockResolvedValue({ status: 'SUCCESS' });
+
+            await snap.checkStatusVa(dto);
+            expect(dto.validateSimulator).toHaveBeenCalled();
+        });
+
+        test('should NOT call validateSimulator when isProduction is true', async () => {
+            snap.isProduction = true;
+            TokenController.prototype.isTokenInvalid.mockReturnValue(false);
+            const dto = { validateCheckStatusVaRequestDto: jest.fn(), validateSimulator: jest.fn() };
+            VaController.prototype.doCheckStatusVa.mockResolvedValue({ status: 'SUCCESS' });
+
+            await snap.checkStatusVa(dto);
+            expect(dto.validateSimulator).not.toHaveBeenCalled();
+        });
+
         test('should handle errors from VaController.doCheckStatusVa', async () => {
             TokenController.prototype.isTokenInvalid.mockReturnValue(false);
             const checkVARequestDTO = { someField: 'value' ,validateCheckStatusVaRequestDto:jest.fn()};

@@ -196,6 +196,14 @@ run("DOKU virtual account integration", () => {
             expect(err.response.data.responseMessage).toBe("Inconsistent Request");
         });
 
+        // L2 guard, non-production side: the simulator still answers locally on a sandbox Snap
+        // (no DOKU call). The production side is covered by unit tests, it would need production.
+        test("sandbox simulator: trxId starting 1110 returns the canned response", async () => {
+            const res = await snap.createVa(buildCreateVaDto("1110L2"));
+            expect(res.responseCode).toBe("2002700");
+            expect(res.virtualAccountData.trxId).toBe("PGPWF167");
+        });
+
         test("missing required field: fails locally (throws Error), no network", async () => {
             const dto = buildCreateVaDto(`L8_${Date.now()}_c`);
             delete dto.virtualAccountName;
@@ -214,6 +222,16 @@ run("DOKU virtual account integration", () => {
             expect(res.virtualAccountData.paymentFlagReason.english).toBe("Pending");
             // NOTE: paidAmount comes back double-nested (paidAmount.value = {value, currency});
             // fore-services' extractPaidAmountValue already handles that. Not asserted here.
+        });
+
+        // L2 guard, non-production side (see createVa): 1113 VA numbers are answered locally.
+        test("sandbox simulator: VA number starting 1113 returns the canned response", async () => {
+            const dto = new CheckStatusVARequestDto();
+            dto.partnerServiceId = "11130000";
+            dto.customerNo = "12345";
+            dto.virtualAccountNo = "1113000012345";
+            dto.additionalInfo = { channel: CHANNEL };
+            expect(await snap.checkStatusVa(dto)).toEqual({ responseCode: "2002600", responseMessage: "success" });
         });
 
         test("non-existent VA: rejects with AxiosError 404 4042601", async () => {
