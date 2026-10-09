@@ -349,7 +349,7 @@ run("DOKU virtual account integration", () => {
             expect(res.responseMessage).toBe("success");
             expect(res.partnerServiceId).toBe(payload.partnerServiceId);
             expect(res.customerNo).toBe(payload.customerNo);
-            // virtualAccountNo: asserted by L4
+            expect(res.virtualAccountNo).toBe(payload.virtualAccountNo);
             expect(res.virtualAccountName).toBe(payload.virtualAccountName);
             expect(res.paymentRequestId).toBe(payload.paymentRequestId);
             expect(res.additionalInfo).toEqual(payload.additionalInfo);
@@ -361,7 +361,7 @@ run("DOKU virtual account integration", () => {
             expect(res.responseMessage).toBe("invalid Token ( B2B)");
             expect(res.partnerServiceId).toBe(payload.partnerServiceId);
             expect(res.customerNo).toBe(payload.customerNo);
-            // virtualAccountNo: asserted by L4
+            expect(res.virtualAccountNo).toBe(payload.virtualAccountNo);
             expect(res.virtualAccountName).toBe(payload.virtualAccountName);
             expect(res.paymentRequestId).toBe(payload.paymentRequestId);
         });
