@@ -37,7 +37,7 @@ const snapOptions = (over = {}) => ({
     ...over,
 });
 
-// "L3_" never matches the simulator's 111-115 trxId prefixes, 90341589... never matches 1113/1116.
+// "L3_" never matches the simulator's 111-115 trxId prefixes, and the VA number never matches 1113/1116.
 const buildCreateVaDto = () => {
     const totalAmount = new TotalAmount();
     totalAmount.value = "10000.00";
@@ -167,8 +167,8 @@ describe("createVa / checkStatusVa timeoutMs (valid token held)", () => {
             expectAbortedAfter(status, 2000);
         }));
 
-    // Infinity would mean "never time out" if it slipped through. The full list of invalid values
-    // (undefined, null, NaN, 0, negative, string) is unit-tested on httpClient.
+    // axios rejects Infinity (ERR_BAD_OPTION_VALUE); the guard maps it to the default instead. The full
+    // list of invalid values (undefined, null, NaN, 0, 0.5, negative, string, too large) is unit-tested on httpClient.
     test("invalid timeoutMs (Infinity): uses the SDK default, never no timeout", () =>
         withServer({}, async () => {
             const s = snapWithToken();

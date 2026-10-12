@@ -101,12 +101,19 @@ let snap = new doku.Snap({
 
 ### Request timeout
 
-Requests to DOKU give up after **3 seconds** by default (`Config.REQUEST_TIMEOUT_MS = 3000`) and reject
-with an error (see below). The default is the fallback for everything; nothing has to be set.
+Some requests to DOKU give up after **3 seconds** by default (`Config.REQUEST_TIMEOUT_MS = 3000`) and
+reject with an error (see below); nothing has to be set.
+
+| Request | Timeout |
+|---|---|
+| B2B token (`getTokenB2B`, including the automatic refresh inside any Snap method) | `tokenTimeoutMs`, default 3s |
+| `createVa`, `checkStatusVa` | per-call `timeoutMs`, default 3s |
+| `createVaV1` | always the default 3s |
+| `getTokenB2B2c`, `updateVa`, `deletePaymentCode`, all direct-debit methods | **none** (unchanged) |
 
 - **B2B token request:** set once when creating the `Snap` (optional):
   ```js
-  const snap = new Snap({ /* ...credentials... */, tokenTimeoutMs: 5000 });
+  const snap = new doku.Snap({ ...credentials, tokenTimeoutMs: 5000 });
   ```
 - **`createVa` and `checkStatusVa`:** pass the timeout as the last argument, in milliseconds, per call:
   ```js
@@ -115,13 +122,23 @@ with an error (see below). The default is the fallback for everything; nothing h
   await snap.checkStatusVa(checkStatusDto);            // default (3s)
   await snap.checkStatusVa(checkStatusDto, undefined); // default (3s)
   ```
-  A token refresh that one of these calls triggers uses `tokenTimeoutMs`, not the call's value.
+  A token refresh that one of these calls triggers uses `tokenTimeoutMs`, not the call's value, so the
+  worst case for such a call is `tokenTimeoutMs + timeoutMs`.
 
-Anything that is not a positive number (`undefined`, `null`, `NaN`, `0`, negative, a string) falls back to
+Anything that is not a positive integer up to 2147483647 (`undefined`, `null`, `NaN`, `Infinity`, `0`, `0.5`, negative, a string) falls back to
 the default, so a bad value never disables the timeout.
 
 Errors: a `createVa` / `checkStatusVa` timeout is an `AxiosError` with `code: 'ECONNABORTED'` and no
 `response`. A token timeout is a plain `Error('Failed to get token: timeout of Nms exceeded')`.
+
+- **Token timeout:** the VA request was never sent, so retrying is safe.
+- **`createVa` timeout = outcome unknown:** DOKU may still have created the VA, and the SDK can't tell.
+  Retry with a **new** `trxId` (re-sending the same `trxId` with a changed payload is rejected with
+  `4042718 Inconsistent Request`); a VA you never got back simply expires.
+- The SDK's timeout takes precedence over a host `axios.defaults.timeout`. A host
+  `transitional.clarifyTimeoutError` / `timeoutErrorMessage` changes the code (`ETIMEDOUT`) / message.
+- Don't log the raw error object: it includes the request headers (bearer token, signature) and payload.
+  Log `err.code`, `err.message` and `err.response?.status` instead.
 
 ## 2. Usage
 

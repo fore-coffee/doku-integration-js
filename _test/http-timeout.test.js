@@ -50,6 +50,9 @@ describe('httpClient timeout resolution (per-call value vs SDK default)', () => 
         ['0 (axios would mean no timeout)', 0],
         ['negative', -5],
         ['a numeric string', '5000'],
+        ['a fraction below 1 (axios would truncate to 0)', 0.5],
+        ['a non-integer', 1500.5],
+        ['above 2^31-1 (Node would clamp to 1ms)', 2147483648],
     ])('falls back to the SDK default for %s', async (_label, value) => {
         await client({ method: 'post', url: 'http://x', timeout: value });
         expect(mockAxios.mock.calls[0][0].timeout).toBe(Config.REQUEST_TIMEOUT_MS);
@@ -58,6 +61,11 @@ describe('httpClient timeout resolution (per-call value vs SDK default)', () => 
     test('falls back to the SDK default when no timeout is given', async () => {
         await client({ method: 'post', url: 'http://x' });
         expect(mockAxios.mock.calls[0][0].timeout).toBe(Config.REQUEST_TIMEOUT_MS);
+    });
+
+    test.each([1, 2147483647])('accepts the boundary value %d', async (value) => {
+        await client({ method: 'post', url: 'http://x', timeout: value });
+        expect(mockAxios.mock.calls[0][0].timeout).toBe(value);
     });
 
     test('uses a valid per-call timeout', async () => {
