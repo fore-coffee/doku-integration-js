@@ -9,14 +9,14 @@ const VaService = require("../_services/vaService");
 
 class VaController{
 
-    async createVa(createVaRequestDto,privateKey, clientId, tokenB2B, isProduction,secretKey){
+    async createVa(createVaRequestDto,privateKey, clientId, tokenB2B, isProduction,secretKey,timeoutMs){
         let timestamp = tokenService.generateTimestamp();
         let endPointUrl = Config.CREATE_VA;
         let httpMethod = "POST"
         let signature = tokenService.generateSymmetricSignature(httpMethod,endPointUrl,tokenB2B,createVaRequestDto,timestamp,secretKey);
         let externalId = commonFunction.generateExternalId();
         let header = vaService.createVaRequesHeaderDto(createVaRequestDto.additionalInfo.channel, clientId, tokenB2B, timestamp, externalId, signature);
-        return VaService.createVa(header, createVaRequestDto, isProduction)
+        return VaService.createVa(header, createVaRequestDto, isProduction, timeoutMs)
     }
     isTokenInvalid(tokenB2B, tokenExpiresIn, tokenGeneratedTimestamp){
         if(TokenService.isTokenEmpty(tokenB2B)){
@@ -49,14 +49,14 @@ class VaController{
         let header = vaService.createVaRequesHeaderDto(deleteVaRequestDto.additionalInfo.channel, clientId, tokenB2B, timestamp, externalId, signature)
         return vaService.doDeletePaymentCode(header, deleteVaRequestDto,isProduction)
     }
-    async doCheckStatusVa(checkVARequestDTO, privateKey,clientId, tokenB2B,secretKey,isProduction){
+    async doCheckStatusVa(checkVARequestDTO, privateKey,clientId, tokenB2B,secretKey,isProduction,timeoutMs){
         let timestamp = tokenService.generateTimestamp();
         let endPointUrl = Config.CHECK_STATUS_VA;
         let httpMethod = "POST"
         let signature = tokenService.generateSymmetricSignature(httpMethod,endPointUrl,tokenB2B,checkVARequestDTO,timestamp,secretKey);
         let externalId = commonFunction.generateExternalId();
         let header = vaService.createVaRequesHeaderDto(checkVARequestDTO.additionalInfo?.channel, clientId, tokenB2B, timestamp, externalId, signature)
-        return vaService.doCheckStatusVa(header, checkVARequestDTO,isProduction)
+        return vaService.doCheckStatusVa(header, checkVARequestDTO,isProduction,timeoutMs)
     }
     
     directInquiryRequestMapping(header,body){

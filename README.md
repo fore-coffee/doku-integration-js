@@ -99,6 +99,30 @@ let snap = new doku.Snap({
 });
 ```
 
+### Request timeout
+
+Requests to DOKU give up after **3 seconds** by default (`Config.REQUEST_TIMEOUT_MS = 3000`) and reject
+with an error (see below). The default is the fallback for everything; nothing has to be set.
+
+- **B2B token request:** set once when creating the `Snap` (optional):
+  ```js
+  const snap = new Snap({ /* ...credentials... */, tokenTimeoutMs: 5000 });
+  ```
+- **`createVa` and `checkStatusVa`:** pass the timeout as the last argument, in milliseconds, per call:
+  ```js
+  await snap.createVa(createVaRequestDto, 8000);       // this call: 8s
+  await snap.checkStatusVa(checkStatusDto, 2000);      // this call: 2s
+  await snap.checkStatusVa(checkStatusDto);            // default (3s)
+  await snap.checkStatusVa(checkStatusDto, undefined); // default (3s)
+  ```
+  A token refresh that one of these calls triggers uses `tokenTimeoutMs`, not the call's value.
+
+Anything that is not a positive number (`undefined`, `null`, `NaN`, `0`, negative, a string) falls back to
+the default, so a bad value never disables the timeout.
+
+Errors: a `createVa` / `checkStatusVa` timeout is an `AxiosError` with `code: 'ECONNABORTED'` and no
+`response`. A token timeout is a plain `Error('Failed to get token: timeout of Nms exceeded')`.
+
 ## 2. Usage
 
 **Initialization**

@@ -20,6 +20,7 @@ class Snap{
     dokuPublicKey = ''
     issuer = '';
     secretKey = '';
+    tokenTimeoutMs;
     
     constructor(options={isProduction:false,privateKey:'',clientID:'',publicKey:'',dokuPublicKey:'',issuer:'', secretKey:''}){
         this.isProduction = options.isProduction;
@@ -29,13 +30,15 @@ class Snap{
         this.dokuPublicKey = options.dokuPublicKey
         this.issuer = options.issuer;
         this.secretKey = options.secretKey;
+        // optional: timeout (ms) of the B2B token request. Missing/invalid -> SDK default (Config.REQUEST_TIMEOUT_MS)
+        this.tokenTimeoutMs = options.tokenTimeoutMs;
     }
    
     
     async getTokenB2B() {
         try {
             let tokenController = new TokenController();
-            const tokenB2BResponseDto = await tokenController.getTokenB2B(this.privateKey, this.clientId, this.isProduction);
+            const tokenB2BResponseDto = await tokenController.getTokenB2B(this.privateKey, this.clientId, this.isProduction, this.tokenTimeoutMs);
             if (!tokenB2BResponseDto.accessToken || !tokenB2BResponseDto.expiresIn) {
                 throw new Error('Invalid token response');
             }
@@ -79,7 +82,9 @@ class Snap{
         this.tokenB2b2cGeneratedTimestamp = Date.now();
     }
 
-    async createVa(createVARequestDto){
+    // timeoutMs (optional): timeout (ms) of this call's DOKU request. Missing/invalid -> SDK default.
+    // A token refresh it triggers uses the constructor's tokenTimeoutMs instead.
+    async createVa(createVARequestDto, timeoutMs){
         createVARequestDto.validateVaRequestDto();
         if (!this.isProduction) {
             const simulatorResponse = createVARequestDto.validateSimulator();
@@ -95,7 +100,7 @@ class Snap{
         }
         
         let vaController = new VaController()
-        let a = await vaController.createVa(createVARequestDto, this.privateKey, this.clientId, this.tokenB2B,this.isProduction,this.secretKey);
+        let a = await vaController.createVa(createVARequestDto, this.privateKey, this.clientId, this.tokenB2B,this.isProduction,this.secretKey,timeoutMs);
         return a
     }
     async createVaV1(createVaRequestDtoV1){
@@ -190,7 +195,9 @@ class Snap{
         let doDeletePaymentCode = await vaController.doDeletePaymentCode(deleteVaRequestDto, this.privateKey, this.clientId, this.tokenB2B,this.secretKey,this.isProduction);
         return doDeletePaymentCode;
     }
-    async checkStatusVa(checkVARequestDTO){
+    // timeoutMs (optional): timeout (ms) of this call's DOKU request. Missing/invalid -> SDK default.
+    // A token refresh it triggers uses the constructor's tokenTimeoutMs instead.
+    async checkStatusVa(checkVARequestDTO, timeoutMs){
         checkVARequestDTO.validateCheckStatusVaRequestDto()
         if (!this.isProduction) {
             const simulatorResponse = checkVARequestDTO.validateSimulator();
@@ -204,7 +211,7 @@ class Snap{
             await this.getTokenB2B();
         }
         let vaController = new VaController();
-        let checkStatus = await vaController.doCheckStatusVa(checkVARequestDTO,this.privateKey,  this.clientId, this.tokenB2B, this.secretKey,this.isProduction);
+        let checkStatus = await vaController.doCheckStatusVa(checkVARequestDTO,this.privateKey,  this.clientId, this.tokenB2B, this.secretKey,this.isProduction,timeoutMs);
         return checkStatus;
     }
    

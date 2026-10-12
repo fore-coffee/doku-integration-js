@@ -1,4 +1,5 @@
 "use strict"
+const { default: axios } = require('axios');
 const httpClient = require('../_commons/httpClient');
 const xml2js = require('xml2js');
 const KJUR = require('jsrsasign');
@@ -34,7 +35,7 @@ module.exports = {
             authorization: tokenB2B
         }
     },
-    async createVa(requestHeaderDto, createVaRequestDto,isProduction) {
+    async createVa(requestHeaderDto, createVaRequestDto,isProduction,timeoutMs) {
         const base_url_api = config.getBaseUrl(isProduction) + config.CREATE_VA;
         let header= {
             "X-PARTNER-ID": requestHeaderDto.xPartnerId,
@@ -49,7 +50,8 @@ module.exports = {
                 method: 'post',
                 url: base_url_api,
                 headers: header,
-                data:createVaRequestDto
+                data:createVaRequestDto,
+                timeout: timeoutMs
             })
             .then((res) => {
                 let response = new CreateVAResponseDTO(res.data);
@@ -74,7 +76,7 @@ module.exports = {
         }
         // console.log(header)
         return await new Promise((resolve, reject) => {
-            httpClient({
+            axios({
                 method: 'put',
                 url: base_url_api,
                 headers: header,
@@ -101,7 +103,7 @@ module.exports = {
             "CHANNEL-ID":requestHeaderDto.channelId
         }
         return await new Promise((resolve, reject) => {
-            httpClient({
+            axios({
                 method: 'delete',
                 url: base_url_api,
                 headers: header,
@@ -116,7 +118,7 @@ module.exports = {
             });
         });
     },
-    async doCheckStatusVa(requestHeaderDto, checkVARequestDTO,isProduction){
+    async doCheckStatusVa(requestHeaderDto, checkVARequestDTO,isProduction,timeoutMs){
         const base_url_api = config.getBaseUrl(isProduction) + config.CHECK_STATUS_VA;
         let header= {
             "X-PARTNER-ID": requestHeaderDto.xPartnerId,
@@ -131,7 +133,8 @@ module.exports = {
                 method: 'post',
                 url: base_url_api,
                 headers: header,
-                data:checkVARequestDTO
+                data:checkVARequestDTO,
+                timeout: timeoutMs
             })
             .then((res) => {
                 let response = new CheckStatusVaResponseDTO(res.data);
