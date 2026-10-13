@@ -11,17 +11,17 @@ declare class Snap {
     clientID: string;
     publicKey: string;
     dokuPublicKey: string;
-    issuer: string;
+    issuer?: string;
     secretKey: string;
     /** Timeout (ms) of the token request. Same fallback rule as `timeoutMs` below. */
     tokenTimeoutMs?: number;
   });
 
   /**
-   * `timeoutMs`: timeout in ms of this call's DOKU request. `undefined` or anything that is not a
-   * positive finite number (0, negative, NaN, a string such as "5000") falls back to the SDK
-   * default (3s); there is no "no timeout". A token refresh it triggers uses the constructor's
-   * `tokenTimeoutMs`, not this value.
+   * `timeoutMs`: timeout in ms of this call's DOKU request. `undefined` or anything that is not an
+   * integer from 1 to 2147483647 (0, 0.5, negative, NaN, Infinity, a string such as "5000")
+   * falls back to the SDK default (3s); there is no "no timeout". A token refresh it triggers
+   * uses the constructor's `tokenTimeoutMs`, not this value.
    */
   createVa(createVARequestDto: CreateVARequestDto, timeoutMs?: number): Promise<CreateVAResponseDTO>;
   /** See `createVa` for `timeoutMs`. */

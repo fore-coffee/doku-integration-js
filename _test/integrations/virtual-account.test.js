@@ -220,8 +220,9 @@ run("DOKU virtual account integration", () => {
             expect(res.responseCode).toBe("2002600");
             expect(res.responseMessage).toBe("Successful");
             expect(res.virtualAccountData.paymentFlagReason.english).toBe("Pending");
-            // NOTE: paidAmount comes back double-nested (paidAmount.value = {value, currency});
-            // fore-services' extractPaidAmountValue already handles that. Not asserted here.
+            // flat TotalAmount, as declared in checkStatusVirtualAccountDataDTO.d.ts (not double-nested)
+            expect(typeof res.virtualAccountData.paidAmount.value).toBe("string");
+            expect(typeof res.virtualAccountData.paidAmount.currency).toBe("string");
         });
 
         // L2 guard, non-production side (see createVa): 1113 VA numbers are answered locally.
