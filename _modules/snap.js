@@ -363,8 +363,8 @@ class Snap{
     
         let tokenController = new TokenController();
         let isTokenInvalid = tokenController.isTokenInvalid(this.tokenB2B, this.tokenExpiresIn, this.tokenGeneratedTimestamp);
-        console.log(this.tokenB2B)
-        console.log(isTokenInvalid)
+        // console.log(this.tokenB2B)
+        // console.log(isTokenInvalid)
         if(isTokenInvalid){
             await this.getTokenB2B();
         }

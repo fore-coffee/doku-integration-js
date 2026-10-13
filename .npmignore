@@ -44,3 +44,6 @@ Thumbs.db
 
 # Local DOKU credentials. npm ignores .gitignore when .npmignore exists, so list it here too.
 .env
+
+# Tests are not part of the published package
+/_test
