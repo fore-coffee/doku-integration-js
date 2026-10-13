@@ -1,4 +1,4 @@
-name: 🔌 Integration Test
+name: 🧪 Tests
 
 on:
   pull_request:
@@ -13,10 +13,32 @@ permissions:
 
 # every run creates real VAs in the DOKU sandbox; a newer push makes the older run pointless
 concurrency:
-  group: integration-${{ github.event.pull_request.number || github.ref }}
+  group: tests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # runs in parallel with `integration` (no `needs`); no secrets, so forks and dependabot get it too
+  # only _test/units: the older suites in _test/ have 51 known upstream failures
+  unit:
+    name: 🧪 Units
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run unit tests
+        run: npm run test:unit
+
   integration:
     name: 🧪 DOKU Sandbox
     runs-on: ubuntu-latest
