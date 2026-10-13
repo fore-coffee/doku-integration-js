@@ -81,7 +81,8 @@ describe('Get Token B2B', () => {
             expect(TokenController.prototype.getTokenB2B).toHaveBeenCalledWith(
                 snap.privateKey,
                 snap.clientId,
-                snap.isProduction
+                snap.isProduction,
+                undefined // timeoutMs: none given, the SDK default applies
             );
 
             // Verify that token response is correct

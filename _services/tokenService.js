@@ -1,5 +1,6 @@
 "use strict"
 const { default: axios } = require('axios');
+const httpClient = require('../_commons/httpClient');
 const KJUR = require('jsrsasign');
 const config = require('../_commons/config');
 const jwt = require('jsonwebtoken');
@@ -147,7 +148,7 @@ module.exports = {
             grantType: 'client_credentials'
         }
     },
-    async createTokenB2B(createTokenB2BRequestDTO,isProduction) {
+    async createTokenB2B(createTokenB2BRequestDTO,isProduction,timeoutMs) {
         const base_url_api = config.getBaseUrl(isProduction) + config.ACCESS_TOKEN;
         let header = {
             "X-CLIENT-KEY": createTokenB2BRequestDTO.clientId,
@@ -158,11 +159,12 @@ module.exports = {
             grantType : createTokenB2BRequestDTO.grantType
         }
         return await new Promise((resolve, reject) => {
-            axios({
+            httpClient({
                 method: 'post',
                 url: base_url_api,
                 headers: header,
-                data: body
+                data: body,
+                timeout: timeoutMs
             })
             .then((res) => {
                 let response = new TokenB2BResponseDTO(res.data)

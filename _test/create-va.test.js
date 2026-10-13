@@ -241,7 +241,8 @@ let secretKey = 'SK-tDzY6MSLBWlNXy3qCsUU';
         snapInstance.clientId,
         'newAccessToken',
         snapInstance.isProduction,
-        snapInstance.secretKey
+        snapInstance.secretKey,
+        undefined // timeoutMs: none given, the SDK default applies
       );
       expect(result).toEqual({ success: true });
     });

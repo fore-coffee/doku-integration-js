@@ -41,11 +41,11 @@ class TokenController{
         return TokenService.compareSignaturesSymmetric(requestSignature,signature)
     }
 
-    async getTokenB2B(privateKey, clientId, isProduction){
+    async getTokenB2B(privateKey, clientId, isProduction, timeoutMs){
        const xTimestamp = TokenService.generateTimestamp(); 
         const signature = TokenService.generateSignature(privateKey, clientId, xTimestamp);
         const createTokenB2BRequestDTO = TokenService.createTokenB2BRequestDTO(signature, xTimestamp, clientId);
-       return await TokenService.createTokenB2B(createTokenB2BRequestDTO,isProduction);
+       return await TokenService.createTokenB2B(createTokenB2BRequestDTO,isProduction,timeoutMs);
     }
     generateInvalidSignatureResponse(){
         const xTimestamp = TokenService.generateTimestamp(); 
