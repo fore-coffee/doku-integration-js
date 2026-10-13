@@ -40,7 +40,7 @@ jobs:
         run: npm run test:unit
 
   integration:
-    name: 🧪 DOKU Sandbox
+    name: 🔌 Integration
     runs-on: ubuntu-latest
     # a hung DOKU call would otherwise hold the run for GitHub's 360 minute default
     timeout-minutes: 10
