@@ -17,12 +17,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # runs in parallel with `integration` (no `needs`); no secrets, so forks and dependabot get it too
-  # only _test/units: the older suites in _test/ have 51 known upstream failures
-  unit:
-    name: 🧪 Units
+  # one job, one runner: unit and integration share a single checkout + npm ci
+  test:
+    name: 🧪 Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # a hung DOKU call would otherwise hold the run for GitHub's 360 minute default
+    timeout-minutes: 10
+
+    # the secrets are scoped to the two steps that need them (not the whole job), so
+    # checkout, setup-node and npm ci never see them
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,31 +37,25 @@ jobs:
           node-version: 24
           cache: npm
 
+      # no install scripts are needed on Linux, and none should ever see the secrets
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      # no secrets, so forks and dependabot get it too
+      # only _test/units: the older suites in _test/ have 51 known upstream failures
       - name: Run unit tests
         run: npm run test:unit
 
-  integration:
-    name: 🔌 Integration
-    runs-on: ubuntu-latest
-    # a hung DOKU call would otherwise hold the run for GitHub's 360 minute default
-    timeout-minutes: 10
-
-    # forks and dependabot run without the DOKU secrets, so there is nothing to test against
-    if: >-
-      github.event_name != 'pull_request' || (
-        github.event.pull_request.head.repo.full_name == github.repository &&
-        github.actor != 'dependabot[bot]'
-      )
-
-    # the secrets are scoped to the two steps that need them (not the whole job), so
-    # checkout, setup-node and npm ci never see them
-
-    steps:
       # the suite skips itself without DOKU_CLIENT_ID, which would pass green having tested nothing
+      # forks and dependabot run without the DOKU secrets, so the integration steps skip for them
+      # runs only after unit tests pass, so a unit failure fails the job without hitting DOKU
       - name: Require DOKU secrets
+        id: secrets
+        if: >-
+          github.event_name != 'pull_request' || (
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.actor != 'dependabot[bot]'
+          )
         env:
           DOKU_CLIENT_ID: ${{ secrets.DOKU_CLIENT_ID }}
           DOKU_SECRET_KEY: ${{ secrets.DOKU_SECRET_KEY }}
@@ -77,20 +75,9 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      # no install scripts are needed on Linux, and none should ever see the secrets
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-
+      # skipped for forks and dependabot, since the secrets check is skipped for them
       - name: Run integration tests
+        if: steps.secrets.outcome == 'success'
         env:
           DOKU_CLIENT_ID: ${{ secrets.DOKU_CLIENT_ID }}
           DOKU_SECRET_KEY: ${{ secrets.DOKU_SECRET_KEY }}
