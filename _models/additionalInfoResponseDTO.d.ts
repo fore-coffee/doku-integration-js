@@ -3,7 +3,7 @@ declare class AdditionalInfoResponseDTO {
   channel?: string;
   howToPayPage?: unknown;
   howToPayApi?: unknown;
-  constructor(data?: unknown);
+  constructor(data: { channel?: string; howToPayPage?: unknown; howToPayApi?: unknown });
   toObject(): {
     channel?: string;
     howToPayPage?: unknown;

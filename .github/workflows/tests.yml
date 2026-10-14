@@ -88,3 +88,8 @@ jobs:
           DOKU_PARTNER_SERVICE_ID: ${{ secrets.DOKU_PARTNER_SERVICE_ID }}
           DOKU_CUSTOMER_NO: ${{ secrets.DOKU_CUSTOMER_NO }}
         run: npm run test:integration
+
+      # one job means a skipped integration step still leaves the check green; say so
+      - name: Note skipped integration tests
+        if: steps.secrets.outcome == 'skipped'
+        run: echo "::notice::Integration tests skipped (fork/Dependabot PR, no DOKU secrets); this check covers unit tests only."

@@ -11,7 +11,7 @@ declare class CheckStatusVirtualAccountData {
   virtualAccountNumber?: string;
   paidAmount: TotalAmount;
   billDetails?: unknown;
-  constructor(...args: Array<unknown>);
+  constructor(data: { paymentFlagReason: { english?: string; indonesia?: string }; [key: string]: unknown });
 }
 
 export = CheckStatusVirtualAccountData;
