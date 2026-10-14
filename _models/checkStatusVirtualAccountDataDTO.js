@@ -20,7 +20,7 @@ class CheckStatusVirtualAccountData {
     this.inquiryRequestId = inquiryRequestId;
     this.paymentRequestId = paymentRequestId;
     this.virtualAccountNumber = virtualAccountNumber;
-    this.paidAmount = new TotalAmount(paidAmount);
+    this.paidAmount = new TotalAmount(paidAmount?.value, paidAmount?.currency);
     this.billDetails =billDetails;
   }
 }
